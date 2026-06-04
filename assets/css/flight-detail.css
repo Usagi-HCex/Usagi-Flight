@@ -46,3 +46,6 @@ canvas{touch-action:none}
 .airline-marquee.scrolling .airline-name-track{padding-right:28px;animation:airlineNameMarquee 8s ease-in-out infinite alternate}
 @keyframes airlineNameMarquee{0%,20%{transform:translateX(0)}80%,100%{transform:translateX(calc(-1 * var(--airline-scroll-distance,0px)))}}
 @media(prefers-reduced-motion:reduce){.airline-marquee.scrolling .airline-name-track{animation:none!important}}
+
+@media(min-width:801px){.shell,.card,.map-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.shell,.card{contain:layout paint style}.pill-link:before,.map-btn:before{animation:none!important;background-position:50% 0}.pill-link:hover:before,.pill-link:focus-visible:before,.map-btn:hover:before,.map-btn:focus-visible:before{animation:detailSoftBorderFlow 1.6s ease-out 1!important}}
+@media(prefers-reduced-motion:reduce){.pill-link:hover:before,.pill-link:focus-visible:before,.map-btn:hover:before,.map-btn:focus-visible:before{animation:none!important}}

@@ -24,3 +24,6 @@ body{background:radial-gradient(circle at 14% 8%,rgba(255,255,255,.90),transpare
 .pill-link,.btn{position:relative;isolation:isolate;overflow:hidden}
 .pill-link:before,.btn:before{content:"";display:block;position:absolute;z-index:2;inset:0;padding:1px;border-radius:inherit;background:linear-gradient(115deg,transparent 0 18%,rgba(125,211,252,.30) 34%,rgba(168,85,247,.16) 48%,rgba(245,158,11,.14) 62%,transparent 78%);background-size:220% 100%;animation:listSoftBorderFlow 6.2s linear infinite;pointer-events:none;opacity:.58;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 @media(prefers-reduced-motion:reduce){.pill-link:before,.btn:before{animation:none!important}}
+
+@media(min-width:801px){.shell,.panel,thead th{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.shell,.panel{contain:layout paint style}.pill-link:before,.btn:before{animation:none!important;background-position:50% 0}.pill-link:hover:before,.pill-link:focus-visible:before,.btn:hover:before,.btn:focus-visible:before{animation:listSoftBorderFlow 1.6s ease-out 1!important}}
+@media(prefers-reduced-motion:reduce){.pill-link:hover:before,.pill-link:focus-visible:before,.btn:hover:before,.btn:focus-visible:before{animation:none!important}}
