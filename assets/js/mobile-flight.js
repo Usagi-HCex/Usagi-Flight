@@ -2,7 +2,6 @@ const MOBILE_SINGLE_API_URL = "../api/flight";
 const mobileEditLink = document.getElementById("mobileEditLink");
 const mobileDetailFields = document.getElementById("mobileDetailFields");
 const mobileDetailStatus = document.getElementById("mobileDetailStatus");
-const mobileSingleMapWrap = document.getElementById("mobileSingleMapWrap");
 const mobileSingleMap = document.getElementById("mobileSingleFlightMap");
 const mobileSingleMapStatus = document.getElementById("mobileSingleMapStatus");
 const mobileRouteDistance = document.getElementById("mobileRouteDistance");
@@ -246,8 +245,6 @@ async function loadMobileRecord() {
 document.getElementById("mobileMapZoomIn").addEventListener("click", () => mobileDetailMapController?.zoomIn());
 document.getElementById("mobileMapZoomOut").addEventListener("click", () => mobileDetailMapController?.zoomOut());
 document.getElementById("mobileMapFit").addEventListener("click", () => mobileDetailMapController?.fit());
-document.getElementById("mobileMapFullscreen").addEventListener("click", () => mobileDetailMapController?.toggleFullscreen(mobileSingleMapWrap));
-document.addEventListener("fullscreenchange", () => setTimeout(() => mobileDetailMapController?.render(), 80));
 window.addEventListener("resize", () => {
   setTimeout(refreshAirportNameMarquee, 80);
   setTimeout(refreshAirlineNameMarquee, 80);
