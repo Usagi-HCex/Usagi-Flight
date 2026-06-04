@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Mobile Edit Flight - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="manifest" href="../manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <link rel="stylesheet" href="../assets/css/mobile.css" />
+  <script src="../assets/vendor/zxing-browser.min.js" defer></script>
+  <script src="../assets/js/mobile-form.js" defer></script>
+  <script src="../assets/js/mobile-tabbar.js" defer></script>
+  <script src="../assets/js/localize.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</head>
+<body class="mobile-app mobile-form-page" data-mobile-form-mode="edit">
+  <main class="mobile-shell mobile-form-shell" aria-labelledby="page-title">
+    <header class="mobile-topbar compact">
+      <div>
+        <p class="mobile-kicker">Flight Record</p>
+        <h1 id="page-title">Edit Flight</h1>
+      </div>
+      <div class="mobile-topbar-actions">
+        <a class="mobile-icon-link mobile-round-icon" href="./flights.html" aria-label="Back to flight list">
+          <span class="mobile-glyph back" aria-hidden="true"></span>
+        </a>
+        <a id="mobileViewLink" class="mobile-icon-link" href="./flight.html">View</a>
+      </div>
+    </header>
+
+    <section class="mobile-bcbp-card" aria-label="Boarding pass reader">
+      <div class="mobile-card-heading">
+        <div>
+          <span>BCBP</span>
+          <strong>Boarding Pass</strong>
+        </div>
+        <span id="mobileBcbpStatus" class="mobile-form-chip">Ready</span>
+      </div>
+      <div class="mobile-scan-actions">
+        <button id="mobileCameraScanBtn" class="mobile-chip-btn" type="button">Scan</button>
+        <label class="mobile-chip-btn" for="mobileBarcodeImage">Image</label>
+        <button id="mobileParseBcbpBtn" class="mobile-chip-btn" type="button">Submit</button>
+      </div>
+      <input id="mobileBarcodeImage" type="file" accept="image/*" capture="environment" hidden />
+      <div id="mobileCameraPanel" class="mobile-camera-panel" hidden>
+        <video id="mobileBarcodeVideo" playsinline muted></video>
+        <button id="mobileStopScanBtn" class="mobile-chip-btn" type="button">Stop</button>
+      </div>
+      <textarea id="mobileBcbpRaw" class="mobile-bcbp-raw" rows="3" spellcheck="false" autocomplete="off" placeholder="BCBP data"></textarea>
+      <div id="mobileBcbpLegPanel" class="mobile-leg-panel" hidden>
+        <select id="mobileBcbpLegSelect" aria-label="BCBP flight segment"></select>
+        <button id="mobileApplyLegBtn" class="mobile-chip-btn" type="button">Apply</button>
+      </div>
+    </section>
+
+    <form id="mobileFlightForm" class="mobile-form-grid" autocomplete="off">
+      <section class="mobile-form-card">
+        <h2>Flight</h2>
+        <div class="mobile-field-stack">
+          <label for="flight_number">Flight Number</label>
+          <input id="flight_number" required data-uppercase inputmode="text" />
+          <label for="flight_date">Date</label>
+          <input id="flight_date" type="date" required />
+          <label for="flight_type">Type</label>
+          <select id="flight_type">
+            <option value="">Select type</option>
+            <option value="International">International</option>
+            <option value="Domestic">Domestic</option>
+            <option value="Regional">Regional(HK, MO, TW)</option>
+            <option value="Special">Special</option>
+          </select>
+          <label for="aircraft_model">Aircraft</label>
+          <input id="aircraft_model" data-uppercase inputmode="text" />
+        </div>
+      </section>
+
+      <section class="mobile-form-card">
+        <h2>Route</h2>
+        <div class="mobile-route-form-grid">
+          <label for="departure_station">From</label>
+          <input id="departure_station" required maxlength="8" data-uppercase inputmode="text" />
+          <label for="departure_terminal">Terminal</label>
+          <input id="departure_terminal" inputmode="text" />
+          <label for="departure_time">Time</label>
+          <input id="departure_time" type="time" />
+          <label for="arrival_station">To</label>
+          <input id="arrival_station" required maxlength="8" data-uppercase inputmode="text" />
+          <label for="arrival_terminal">Terminal</label>
+          <input id="arrival_terminal" inputmode="text" />
+          <label for="arrival_time">Time</label>
+          <input id="arrival_time" type="time" />
+        </div>
+      </section>
+
+      <section class="mobile-form-card">
+        <h2>Baggage</h2>
+        <div class="mobile-field-stack">
+          <label for="baggage_status">Baggage</label>
+          <select id="baggage_status">
+            <option value="No" selected>No</option>
+            <option value="Yes">Yes</option>
+          </select>
+          <label for="baggage_no_weight">Detail</label>
+          <input id="baggage_no_weight" data-uppercase inputmode="text" disabled />
+        </div>
+      </section>
+
+      <section class="mobile-form-card">
+        <h2>Remarks</h2>
+        <textarea id="remarks" rows="4"></textarea>
+      </section>
+
+      <section class="mobile-form-submit">
+        <p id="mobileFormStatus" class="mobile-status-text" aria-live="polite"></p>
+        <button id="mobileSubmitBtn" class="mobile-submit-btn" type="submit">Update Flight</button>
+      </section>
+    </form>
+  </main>
+
+  <nav class="mobile-tabbar" aria-label="Mobile navigation">
+    <a href="./index.html">Home</a>
+    <a class="active" href="./flights.html">Flights</a>
+    <a href="./map.html">Map</a>
+  </nav>
+</body>
+</html>

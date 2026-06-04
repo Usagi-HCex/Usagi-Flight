@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flight Route Map - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <script src="./assets/js/mobile-redirect.js"></script>
+  <link rel="stylesheet" href="./assets/css/flight-map.css" />
+  <script src="./assets/js/flight-map-renderer.js" defer></script>
+  <script src="./assets/js/flight-map-page.js" defer></script>
+  <script src="./assets/js/localize.js" defer></script>
+  <script src="./assets/js/pwa.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar"><div class="eyebrow">Flight Route Map</div><nav class="nav"><a class="pill-link" href="./index.html">Dashboard</a><a class="pill-link" href="./show_flights.html">Flight Records</a><a class="pill-link" href="./add_flight.html">Add Flight</a></nav></div>
+    <h1>Flight Route Map</h1>
+    <p class="subtitle">Visualize all recorded flights or a selected date range as great-circle routes. Repeated flights on the same sector are drawn as naturally layered curves, with the same start/end points and a gentle mid-route separation.</p>
+
+    <section class="panel">
+      <div class="controls">
+        <div class="group"><label for="startDate">Start Date</label><input id="startDate" type="date" /><label for="endDate">End Date</label><input id="endDate" type="date" /></div>
+        <div class="group"><label for="routeMode">Mode</label><select id="routeMode"><option value="layered" selected>Layered Flights</option><option value="aggregate">Aggregated Routes</option><option value="individual">Individual Flights</option></select><label class="check"><input id="labelToggle" type="checkbox" checked /> Airport Names</label><label class="check"><input id="airportToggle" type="checkbox" checked /> Airports</label><label class="check"><input id="routeToggle" type="checkbox" checked /> Routes</label><input id="mapToggle" type="checkbox" checked hidden aria-hidden="true" tabindex="-1" /><button id="drawBtn" class="btn" type="button">Draw Routes</button><button id="resetBtn" class="btn" type="button">Reset</button></div>
+      </div>
+      <div class="stats"><span id="recordStat" class="stat">Records: -</span><span id="routeStat" class="stat">Routes: -</span><span id="airportStat" class="stat">Airports: -</span><span id="missingStat" class="stat warn">Missing: -</span><span id="summaryStat" class="stat">Summary: -</span><span id="distanceStat" class="stat">Distance: -</span><span id="baggageStat" class="stat">Baggage: -</span></div>
+    </section>
+
+    <div class="layout">
+      <section id="mapPanel" class="map-panel">
+        <div class="legend" aria-label="Map legend"><div class="legend-row"><span class="legend-line"></span><span>Route</span></div><div class="legend-row"><span class="legend-line selected"></span><span>Selected</span></div><div class="legend-row"><span class="legend-dot"></span><span>Airport</span></div></div>
+        <div class="map-actions"><button id="zoomInBtn" class="btn" type="button">＋</button><button id="zoomOutBtn" class="btn" type="button">－</button><button id="fitBtn" class="btn" type="button">Fit</button><button id="clearHighlightBtn" class="btn" type="button">Clear</button><button id="fullscreenBtn" class="btn" type="button">Fullscreen</button><button id="exportBtn" class="btn" type="button">Export PNG</button></div>
+        <canvas id="flightMapCanvas" aria-label="Flight route map"></canvas>
+        <div id="mapTooltip" class="map-tooltip" hidden></div>
+        <div id="mapStatus" class="map-status">Loading...</div>
+      </section>
+      <aside class="side">
+        <section class="side-card"><h2>Top Sectors</h2><div id="topRoutesList" class="list"><p class="muted">Loading...</p></div></section>
+        <section class="side-card"><h2>Airports</h2><div id="airportList" class="list"><p class="muted">Loading...</p></div></section>
+        <section class="side-card"><h2>Missing Codes</h2><div id="missingList" class="list"><p class="muted">None</p></div></section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

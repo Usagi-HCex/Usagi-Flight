@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Flight Record - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <script src="./assets/js/mobile-redirect.js"></script>
+  <link rel="stylesheet" href="./assets/css/flight-form.css" />
+  <script src="./assets/js/add-flight-page.js" defer></script>
+  <script src="./assets/js/localize.js" defer></script>
+  <script src="./assets/js/pwa.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div class="eyebrow">Add Flight Record</div>
+      <a class="pill-link" href="./index.html">← Dashboard</a>
+    </div>
+    <h1>Add Flight Record</h1>
+    <form id="flightForm" autocomplete="off">
+      <div class="grid">
+        <section class="card">
+          <h2>Flight Identity</h2>
+          <div class="fields">
+            <div><label for="flight_number">Flight Number</label><input id="flight_number" required data-uppercase placeholder="JL001 / NH217" /></div>
+            <div><label for="aircraft_model">Aircraft Model</label><input id="aircraft_model" data-uppercase placeholder="B789 / A359" /></div>
+            <div><label for="flight_type">Flight Type</label><select id="flight_type"><option value="">Select flight type</option><option value="International">International</option><option value="Domestic">Domestic</option><option value="Regional">Regional(HK, MO, TW)</option><option value="Special">Special</option></select></div>
+            <div><label for="flight_date">Date (Local Time)</label><input id="flight_date" type="date" required /></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Baggage</h2>
+          <div class="fields">
+            <div><label for="baggage_status">Baggage</label><select id="baggage_status"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>
+            <div><label for="baggage_no_weight">Baggage Detail</label><input id="baggage_no_weight" placeholder="1PC/23KG" disabled data-uppercase /></div>
+          </div>
+        </section>
+
+        <section class="card full">
+          <h2>Route & Time</h2>
+          <div class="route-fields">
+            <div><label for="departure_station">Departure Station</label><input id="departure_station" required maxlength="8" data-uppercase placeholder="SDJ / RJSS" /></div>
+            <div><label for="departure_terminal">Departure Terminal</label><input id="departure_terminal" placeholder="I / T1 / Terminal 1" /></div>
+            <div><label for="departure_time">Departure Time</label><input id="departure_time" type="time" /></div>
+            <div><label for="arrival_station">Arrival Station</label><input id="arrival_station" required maxlength="8" data-uppercase placeholder="HKG / VHHH" /></div>
+            <div><label for="arrival_terminal">Arrival Terminal</label><input id="arrival_terminal" placeholder="T1 / T2" /></div>
+            <div><label for="arrival_time">Arrival Time</label><input id="arrival_time" type="time" /></div>
+          </div>
+        </section>
+
+        <section class="card full">
+          <h2>Remarks & Comments</h2>
+          <textarea id="remarks" placeholder="Seat, cabin class, lounge, aircraft notes, delay reason, special memory, etc."></textarea>
+        </section>
+      </div>
+
+      <div class="footer">
+        <p id="statusMessage" class="status" aria-live="polite"></p>
+        <button id="submitBtn" class="submit" type="submit">Save Flight Record</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <script src="./assets/js/mobile-redirect.js"></script>
+  <link rel="stylesheet" href="./assets/css/dashboard.css" />
+  <script src="./assets/js/dashboard.js" defer></script>
+  <script src="./assets/js/localize.js" defer></script>
+  <script src="./assets/js/pwa.js" defer></script>
+</head>
+<body>
+  <main class="shell" aria-labelledby="page-title">
+    <header class="header">
+      <div class="header-main">
+        <div class="eyebrow">Flight Log Dashboard</div>
+        <h1 id="page-title">Personal Flight Log Management System</h1>
+        <p class="subtitle">Manage encrypted flight records, review route histories, export CSV data, and visualize great-circle flight maps using a static OurAirports coordinate index.</p>
+      </div>
+      <div class="dashboard-toolbar" aria-label="Dashboard tools">
+        <button id="bulkImportBtn" class="toolbar-btn" type="button">Batch Import</button>
+        <input id="bulkImportInput" type="file" accept=".csv,text/csv" hidden />
+      </div>
+      <aside class="status-panel" aria-label="System information">
+        <p class="status-title">System Information</p>
+        <div class="status-row"><span>System Version</span><span class="status-value">2026.05.30 with BLOB + Map</span></div>
+        <div class="status-row"><span>Cache Status</span><span class="status-value" id="cacheStatus">Checking...</span></div>
+        <div class="status-row"><span>Cache Revision</span><span class="status-value" id="cacheRevision">-</span></div>
+        <div class="status-row"><span>Current Time</span><span class="status-value" id="currentTime">--:--:--</span></div>
+      </aside>
+    </header>
+    <section class="grid" aria-label="Main actions">
+      <a class="card" href="./add_flight.html"><div><div class="card__icon icon-add" aria-hidden="true"></div><div class="card__body"><h2 class="card__title">Add Flight Record</h2><p class="card__text">Register flight number, aircraft model, route, terminals, local date and time, baggage information, and remarks.</p><span class="card__meta">NEW ENTRY</span></div></div><span class="card__action">Open</span></a>
+      <a class="card" href="./show_flights.html"><div><div class="card__icon icon-list" aria-hidden="true"></div><div class="card__body"><h2 class="card__title">Show Flight Records</h2><p class="card__text">Browse encrypted flight records through the cached paginated table.</p><span class="card__meta">CACHED VIEW</span></div></div><span class="card__action">Open</span></a>
+      <a class="card" href="./flight_map.html"><div><div class="card__icon icon-map" aria-hidden="true"></div><div class="card__body"><h2 class="card__title">Flight Route Map</h2><p class="card__text">View all recorded flights as great-circle routes, filter by date range, zoom, fullscreen, and export the map as PNG.</p><span class="card__meta">GLOBAL MAP</span></div></div><span class="card__action">Open</span></a>
+      <a class="card" href="./api/export_flights"><div><div class="card__icon icon-export" aria-hidden="true"></div><div class="card__body"><h2 class="card__title">Export Flight Records</h2><p class="card__text">Export decrypted flight records as a CSV file after server-side verification and secure record processing.</p><span class="card__meta">CSV EXPORT</span></div></div><span class="card__action">Download</span></a>
+    </section>
+    <section id="importPanel" class="import-panel" aria-live="polite" hidden>
+      <div class="import-panel__head">
+        <div>
+          <span class="import-panel__eyebrow">CSV Import</span>
+          <strong>Batch Import</strong>
+        </div>
+        <button id="importPanelClose" class="import-panel__close" type="button" aria-label="Close import panel">×</button>
+      </div>
+      <div class="import-progress" aria-hidden="true"><span id="importProgressBar"></span></div>
+      <p id="importProgressText" class="import-panel__text">Waiting for CSV file.</p>
+      <p id="importSummaryText" class="import-panel__summary"></p>
+    </section>
+    <footer class="footer-note">© 2026 <a href="https://github.com/Usagi-HCex" target="_blank" rel="noopener noreferrer">Usagi-HCex</a>. <a href="https://usagi-hecex.pages.dev/" target="_blank" rel="noopener noreferrer">Homepage</a>. <span>Licensed under the Apache License 2.0. Static aviation and map data are provided for personal log visualization only.</span></footer>
+  </main>
+</body>
+</html>

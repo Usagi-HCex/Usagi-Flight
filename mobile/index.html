@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Mobile Dashboard - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="manifest" href="../manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <link rel="stylesheet" href="../assets/css/mobile.css" />
+  <script src="../assets/js/mobile-home.js" defer></script>
+  <script src="../assets/js/mobile-tabbar.js" defer></script>
+  <script src="../assets/js/localize.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</head>
+<body class="mobile-app">
+  <main class="mobile-shell mobile-home" aria-labelledby="page-title">
+    <header class="mobile-topbar">
+      <div>
+        <p class="mobile-kicker">Flight Log</p>
+        <h1 id="page-title">Dashboard</h1>
+      </div>
+      <a class="mobile-icon-link" href="../index.html?desktop=1" aria-label="Open desktop dashboard">Desktop</a>
+    </header>
+
+    <section class="mobile-command-orbit" aria-hidden="true">
+      <span class="orbit-core"></span>
+      <span class="orbit-ring one"></span>
+      <span class="orbit-ring two"></span>
+      <span class="orbit-pulse"></span>
+    </section>
+
+    <section class="mobile-status-panel" aria-label="System information">
+      <div><span>Cache</span><strong id="mobileCacheStatus">Checking</strong></div>
+      <div><span>Revision</span><strong id="mobileCacheRevision">-</strong></div>
+      <div><span>Local Time</span><strong id="mobileCurrentTime">--:--:--</strong></div>
+    </section>
+
+    <nav class="mobile-action-grid" aria-label="Main actions">
+      <a class="mobile-action-card" href="./add.html">
+        <span class="mobile-action-icon add" aria-hidden="true"></span>
+        <strong>Add Flight</strong>
+        <small>New entry</small>
+      </a>
+      <a class="mobile-action-card" href="./flights.html">
+        <span class="mobile-action-icon list" aria-hidden="true"></span>
+        <strong>Records</strong>
+        <small>Card list</small>
+      </a>
+      <a class="mobile-action-card" href="./map.html">
+        <span class="mobile-action-icon map" aria-hidden="true"></span>
+        <strong>Route Map</strong>
+        <small>Touch map</small>
+      </a>
+      <a class="mobile-action-card" href="../api/export_flights">
+        <span class="mobile-action-icon export" aria-hidden="true"></span>
+        <strong>Export CSV</strong>
+        <small>Download</small>
+      </a>
+    </nav>
+  </main>
+
+  <nav class="mobile-tabbar" aria-label="Mobile navigation">
+    <a class="active" href="./index.html">Home</a>
+    <a href="./flights.html">Flights</a>
+    <a href="./map.html">Map</a>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Personal Flight Log Management System
+Copyright 2026 Usagi-HCex
+GitHub: https://github.com/Usagi-HCex
+Homepage: https://usagi-hecex.pages.dev/
+
+This product includes or may include static aviation and map datasets used for route visualization.
+
+Third-party data notes:
+
+- Airport coordinate data is derived from public airport data provided by OurAirports. Thanks to OurAirports for maintaining this public aviation dataset: https://ourairports.com/
+- World coastline / boundary line data is intended to be derived from Natural Earth-style public map data. Review the current Natural Earth terms and attribution expectations before redistributing generated GeoJSON assets in a public release.
+- Browser barcode decoding uses @zxing/browser (MIT License) and the bundled @zxing/library (Apache License 2.0). The generated browser bundle is copied into assets/vendor/ during build and is not committed as source.
+
+The application source code is licensed under the Apache License, Version 2.0. See the LICENSE file for details.

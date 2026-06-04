@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Mobile Flight Detail - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="manifest" href="../manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <link rel="stylesheet" href="../assets/css/mobile.css" />
+  <script src="../assets/js/flight-map-renderer.js" defer></script>
+  <script src="../assets/js/mobile-flight.js" defer></script>
+  <script src="../assets/js/mobile-tabbar.js" defer></script>
+  <script src="../assets/js/localize.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</head>
+<body class="mobile-app">
+  <main class="mobile-shell mobile-detail" aria-labelledby="page-title">
+    <header class="mobile-topbar compact">
+      <div>
+        <p class="mobile-kicker">Flight Detail</p>
+        <h1 id="page-title">Flight</h1>
+      </div>
+      <div class="mobile-topbar-actions">
+        <a class="mobile-icon-link mobile-round-icon" href="./flights.html" aria-label="Back to flight list">
+          <span class="mobile-glyph back" aria-hidden="true"></span>
+        </a>
+        <a id="mobileEditLink" class="mobile-icon-link" href="./edit.html">Edit</a>
+      </div>
+    </header>
+
+    <section id="mobileDetailHero" class="mobile-detail-hero">
+      <div class="mobile-detail-hero-grid">
+        <span id="mobileDetailDate" class="mobile-detail-date">----</span>
+        <span id="mobileAirlineName" class="mobile-airline-name" hidden><span class="mobile-airline-name-track"></span></span>
+        <strong id="mobileDetailFlight" class="mobile-detail-flight">Loading</strong>
+        <span id="mobileDetailType" class="mobile-detail-type">-</span>
+        <span id="mobileDetailStatus" class="mobile-detail-status">Loading</span>
+      </div>
+    </section>
+
+    <section id="mobileSingleMapWrap" class="mobile-detail-map">
+      <canvas id="mobileSingleFlightMap" aria-label="Single flight map"></canvas>
+      <div class="mobile-map-actions detail-actions">
+        <button id="mobileMapZoomIn" type="button">+</button>
+        <button id="mobileMapZoomOut" type="button">-</button>
+        <button id="mobileMapFit" type="button">Fit</button>
+        <button id="mobileMapFullscreen" type="button">Full</button>
+      </div>
+      <div id="mobileSingleMapStatus" class="mobile-map-status">Loading map...</div>
+    </section>
+
+    <section class="mobile-route-card">
+      <div class="mobile-route-row">
+        <span id="mobileDepartureTime">--:--</span>
+        <div class="mobile-station-block">
+          <strong id="mobileDepartureStation" class="mobile-station-code">---</strong>
+          <span id="mobileDepartureAirportName" class="mobile-airport-name">-</span>
+        </div>
+        <small id="mobileDepartureTerminal">-</small>
+      </div>
+      <div class="mobile-route-line" aria-hidden="true"></div>
+      <div class="mobile-route-row">
+        <span id="mobileArrivalTime">--:--</span>
+        <div class="mobile-station-block">
+          <strong id="mobileArrivalStation" class="mobile-station-code">---</strong>
+          <span id="mobileArrivalAirportName" class="mobile-airport-name">-</span>
+        </div>
+        <small id="mobileArrivalTerminal">-</small>
+      </div>
+      <div class="mobile-route-distance">
+        <span>Estimated Distance</span>
+        <strong id="mobileRouteDistance">-</strong>
+      </div>
+    </section>
+
+    <section id="mobileDetailFields" class="mobile-detail-fields" aria-live="polite"></section>
+  </main>
+
+  <nav class="mobile-tabbar" aria-label="Mobile navigation">
+    <a href="./index.html">Home</a>
+    <a class="active" href="./flights.html">Flights</a>
+    <a href="./map.html">Map</a>
+  </nav>
+</body>
+</html>

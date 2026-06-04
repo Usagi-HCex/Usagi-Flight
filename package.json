@@ -1,0 +1,37 @@
+{
+  "name": "usagi-flight",
+  "version": "1.0.0",
+  "description": "Personal DB for flight information data",
+  "scripts": {
+    "build:airports": "node tools/build-airport-index.mjs",
+    "build:airlines": "node tools/build-airline-index.mjs",
+    "build:worldmap": "node tools/build-world-map.mjs",
+    "build:barcode": "node tools/build-barcode-reader.mjs",
+    "build:icons": "node tools/build-icons.mjs",
+    "protect": "node tools/protect-js.mjs",
+    "build": "npm run build:airports && npm run build:airlines && npm run build:worldmap && npm run build:barcode && npm run build:icons && npm run protect",
+    "build:target": "node tools/build-target.mjs",
+    "build:workers": "node tools/build-target.mjs --target=workers",
+    "prepare:workers": "node tools/prepare-workers-build.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Usagi-HCex/usagi-flight.git"
+  },
+  "keywords": [],
+  "author": "Usagi-HCex",
+  "license": "Apache-2.0",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Usagi-HCex/usagi-flight/issues"
+  },
+  "homepage": "https://usagi-hecex.pages.dev/",
+  "devDependencies": {
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.4",
+    "javascript-obfuscator": "^5.4.2"
+  },
+  "dependencies": {
+    "@zxing/browser": "^0.2.0"
+  }
+}

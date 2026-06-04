@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flight Records - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <script src="./assets/js/mobile-redirect.js"></script>
+  <link rel="stylesheet" href="./assets/css/flight-list.css" />
+  <script src="./assets/js/show-flights-page.js" defer></script>
+  <script src="./assets/js/localize.js" defer></script>
+  <script src="./assets/js/pwa.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar"><div class="eyebrow">Flight Records</div><nav class="nav"><a class="pill-link" href="./index.html">Dashboard</a><a class="pill-link" href="./add_flight.html">Add Flight</a><a class="pill-link" href="./api/export_flights">Export CSV</a></nav></div>
+    <h1>Show Flight Records</h1>
+    <section class="panel">
+      <div class="toolbar">
+        <div class="controls"><label for="pageLimit">Records per page</label><select id="pageLimit"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select><button id="applyPageLimitBtn" class="btn" type="button">Apply</button></div>
+        <div class="controls"><label for="filterText">Filter current page</label><input id="filterText" type="text" placeholder="JL001 / HND / T1 / B789" /><button id="clearFilterBtn" class="btn" type="button">Clear</button><button id="refreshBtn" class="btn" type="button">Refresh</button><button id="forceRebuildBtn" class="btn" type="button">Rebuild Cache</button></div>
+      </div>
+      <div class="table-scroll"><table><thead><tr><th>No.</th><th>Date</th><th>Flight No.</th><th>A/C Type</th><th>Departure</th><th>Arrival</th><th>Actions</th></tr></thead><tbody id="recordsBody"><tr><td colspan="7">Loading flight records...</td></tr></tbody></table></div>
+      <div class="pagination status-line"><div class="page-buttons"><button id="firstPageBtn" class="btn" type="button" disabled>First Page</button><button id="prevPageBtn" class="btn" type="button" disabled>Previous</button><button id="nextPageBtn" class="btn" type="button" disabled>Next</button></div><div id="statusChip" class="status status-inline">Ready</div></div>
+      <div id="paginationInfo" class="status">Loading page information...</div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Flight Record - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <script src="./assets/js/mobile-redirect.js"></script>
+  <link rel="stylesheet" href="./assets/css/flight-detail.css" />
+  <script src="./assets/js/flight-map-renderer.js" defer></script>
+  <script src="./assets/js/flight-view-page.js" defer></script>
+  <script src="./assets/js/localize.js" defer></script>
+  <script src="./assets/js/pwa.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar"><div class="eyebrow">Flight Record Detail</div><nav class="nav"><a class="pill-link" href="./index.html">Dashboard</a><a class="pill-link" href="./show_flights.html">Flight Records</a><a class="pill-link" href="./flight_map.html">Flight Map</a><a id="editLink" class="pill-link" href="./flight_edit.html">Edit Record</a></nav></div>
+    <h1>View Flight Record</h1>
+    <section class="grid">
+      <div class="card"><h2>Record</h2><div class="kv"><div class="k">No.</div><div id="record_no" class="v">-</div></div><div class="kv"><div class="k">Payload Version</div><div id="payload_version" class="v">-</div></div><div class="kv"><div class="k">Status</div><div id="statusMessage" class="v status inline-status" aria-live="polite">Loading...</div></div><div class="kv route-distance-row"><div class="k">Route Distance</div><div id="route_distance" class="v route-distance-value">-</div></div></div>
+      <div class="card"><h2>Flight Identity</h2><div class="kv"><div class="k">Flight Number</div><div class="v flight-number-combo"><span id="flight_number">-</span><span id="airline_name" class="airline-marquee" hidden><span class="airline-name-track"></span></span></div></div><div class="kv"><div class="k">Aircraft Model</div><div id="aircraft_model" class="v">-</div></div><div class="kv"><div class="k">Flight Type</div><div id="flight_type" class="v">-</div></div><div class="kv"><div class="k">Date</div><div id="flight_date" class="v">-</div></div></div>
+      <div class="card"><h2>Departure</h2><div class="kv"><div class="k">Station / Terminal</div><div class="v station-combo"><span id="departure_station">-</span><span class="station-separator" aria-hidden="true">/</span><span id="departure_terminal">-</span></div></div><div class="kv"><div class="k">Airport Name</div><div id="departure_airport_name" class="v airport-marquee"><span>-</span></div></div><div class="kv"><div class="k">Time</div><div id="departure_time" class="v">-</div></div></div>
+      <div class="card"><h2>Arrival</h2><div class="kv"><div class="k">Station / Terminal</div><div class="v station-combo"><span id="arrival_station">-</span><span class="station-separator" aria-hidden="true">/</span><span id="arrival_terminal">-</span></div></div><div class="kv"><div class="k">Airport Name</div><div id="arrival_airport_name" class="v airport-marquee"><span>-</span></div></div><div class="kv"><div class="k">Time</div><div id="arrival_time" class="v">-</div></div></div>
+      <div class="card full"><h2>Baggage & Remarks</h2><div class="kv"><div class="k">Baggage</div><div id="baggage_no_weight" class="v">-</div></div><div class="kv"><div class="k">Remarks</div><div id="remarks" class="v">-</div></div></div>
+      <div class="card full"><h2>Integrity & Timestamps</h2><div class="kv"><div class="k">HMAC</div><div id="hmac_value" class="v">-</div></div><div class="kv"><div class="k">Created At (UTC)</div><div id="created_at" class="v">-</div></div><div class="kv"><div class="k">Updated At (UTC)</div><div id="updated_at" class="v">-</div></div></div>
+    </section>
+    <section class="card full map-card"><h2>Route Map</h2><div id="singleMapWrap" class="map-wrap"><div class="map-actions"><button id="mapZoomIn" class="map-btn" type="button">＋</button><button id="mapZoomOut" class="map-btn" type="button">－</button><button id="mapFit" class="map-btn" type="button">Fit</button><button id="mapFullscreen" class="map-btn" type="button">Fullscreen</button><button id="mapExport" class="map-btn" type="button">Export PNG</button></div><canvas id="singleFlightMap" aria-label="Single flight route map"></canvas><div id="singleMapStatus" class="map-status">Loading map...</div></div></section>
+  </main>
+</body>
+</html>

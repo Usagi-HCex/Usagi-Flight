@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Mobile Flights List - Personal Flight Log Management System</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="shortcut icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="manifest" href="../manifest.webmanifest" crossorigin="use-credentials" />
+  <meta name="theme-color" content="#bae6fd" />
+  <link rel="stylesheet" href="../assets/css/mobile.css" />
+  <script src="../assets/js/mobile-flights.js" defer></script>
+  <script src="../assets/js/mobile-tabbar.js" defer></script>
+  <script src="../assets/js/localize.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</head>
+<body class="mobile-app">
+  <main class="mobile-shell mobile-list" aria-labelledby="page-title">
+    <header class="mobile-topbar compact">
+      <div>
+        <p class="mobile-kicker">Flight Records</p>
+        <h1 id="page-title">Flights List</h1>
+      </div>
+      <div class="mobile-topbar-actions">
+        <button id="mobileFilterToggle" class="mobile-icon-link mobile-round-icon" type="button" aria-label="Search and settings" aria-controls="mobileFilterPanel" aria-expanded="false">
+          <span class="mobile-glyph search" aria-hidden="true"></span>
+        </button>
+        <a class="mobile-icon-link" href="./add.html">Add</a>
+      </div>
+    </header>
+
+    <section class="mobile-status-panel mobile-flight-summary" aria-label="Flight statistics">
+      <div><span>Sectors</span><strong id="mobileTotalSectors">-</strong></div>
+      <div><span>Airports</span><strong id="mobileAirportCount">-</strong></div>
+      <div><span>Airlines</span><strong id="mobileAirlineCount">-</strong></div>
+    </section>
+    <section class="mobile-distance-panel" aria-label="Estimated total flight distance">
+      <span>Estimated Distance</span>
+      <strong id="mobileTotalDistance">-</strong>
+    </section>
+
+    <section id="mobileFilterPanel" class="mobile-filter-panel" aria-label="Flight list controls" hidden>
+      <input id="mobileFilterText" type="search" placeholder="Search flight / airport / terminal" />
+      <div class="mobile-control-row">
+        <select id="mobilePageLimit" aria-label="Records per page">
+          <option value="10" selected>10 / page</option>
+          <option value="20">20 / page</option>
+          <option value="50">50 / page</option>
+        </select>
+        <button id="mobileRefreshBtn" class="mobile-chip-btn" type="button">Refresh</button>
+      </div>
+    </section>
+
+    <section class="mobile-flight-feed" aria-live="polite">
+      <div id="mobileRecordsList" class="mobile-timeline">
+        <p class="mobile-muted">Loading...</p>
+      </div>
+    </section>
+
+    <section class="mobile-pager" aria-label="Pagination">
+      <button id="mobilePrevBtn" class="mobile-chip-btn" type="button" disabled>Previous</button>
+      <span id="mobilePageInfo">Page -</span>
+      <button id="mobileNextBtn" class="mobile-chip-btn" type="button" disabled>Next</button>
+    </section>
+    <p id="mobileListStatus" class="mobile-status-text" hidden>Loading</p>
+  </main>
+
+  <nav class="mobile-tabbar" aria-label="Mobile navigation">
+    <a href="./index.html">Home</a>
+    <a class="active" href="./flights.html">Flights</a>
+    <a href="./map.html">Map</a>
+  </nav>
+</body>
+</html>
