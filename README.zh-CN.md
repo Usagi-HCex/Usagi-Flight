@@ -160,7 +160,7 @@ ON flight_records(lower(hex(hmac_value_blob)));
 在 Cloudflare Pages 中连接仓库，然后设置：
 
 ```text
-Production branch: develop
+Production branch: main
 Build command: npm run build
 Build output directory: dist
 Root directory: /
@@ -189,7 +189,7 @@ HMAC_SECRET
 ```bash
 npm install
 npm run build
-npx wrangler pages deploy dist --project-name <pages-project-name> --branch develop
+npx wrangler pages deploy dist --project-name <pages-project-name> --branch main
 ```
 
 CLI 设置 Pages secrets：
@@ -220,7 +220,7 @@ D1 binding: DB
 创建并连接仓库后设置：
 
 ```text
-Production branch: develop
+Production branch: main
 Build command: npm run build:workers
 Deploy command: npx wrangler deploy --config wrangler.toml
 ```
