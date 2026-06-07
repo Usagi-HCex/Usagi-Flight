@@ -49,12 +49,57 @@ function getListParams(request) {
   const requestedLimit = parsePositiveInteger(url.searchParams.get("limit"), DEFAULT_PAGE_LIMIT);
   const limit = Math.min(Math.max(requestedLimit, 1), MAX_PAGE_LIMIT);
   const forceRebuild = url.searchParams.get("force_rebuild") === "1";
+  const searchQuery = normalizeSearchQuery(
+    url.searchParams.get("q") ||
+    url.searchParams.get("search") ||
+    url.searchParams.get("filter") ||
+    ""
+  );
 
   return {
     page,
     limit,
-    forceRebuild
+    forceRebuild,
+    searchQuery
   };
+}
+
+function normalizeSearchQuery(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").slice(0, 120);
+}
+
+function buildRecordSearchText(record) {
+  return [
+    record?.id,
+    record?.record_no,
+    record?.flight_number,
+    record?.aircraft_model,
+    record?.flight_type,
+    record?.flight_date,
+    record?.departure_station,
+    record?.departure_terminal,
+    record?.departure_time,
+    record?.arrival_station,
+    record?.arrival_terminal,
+    record?.arrival_time,
+    record?.baggage_no_weight,
+    record?.hmac_value,
+    record?.created_at,
+    record?.updated_at
+  ].map((value) => String(value ?? "").toLowerCase()).join(" ");
+}
+
+function filterFlightRecords(records, query) {
+  const normalizedQuery = normalizeSearchQuery(query).toLowerCase();
+  if (!normalizedQuery) return records;
+
+  const tokens = normalizedQuery.split(" ").filter(Boolean);
+  if (!tokens.length) return records;
+
+  return records.filter((record) => {
+    const haystack = buildRecordSearchText(record);
+    return tokens.every((token) => haystack.includes(token));
+  });
 }
 
 function validateRequiredFields(body) {
@@ -68,7 +113,7 @@ export async function onRequestGet(context) {
   const d1 = createD1Session(context, "primary");
 
   try {
-    const { page, limit, forceRebuild } = getListParams(context.request);
+    const { page, limit, forceRebuild, searchQuery } = getListParams(context.request);
     const airportIndex = await loadAirportIndexForStats(context.request, context.env);
     const listPayload = await getFlightRecordsListWithSession(
       d1.session,
@@ -77,13 +122,20 @@ export async function onRequestGet(context) {
     );
 
     const allRecords = Array.isArray(listPayload.records) ? listPayload.records : [];
-    const paged = paginateFlightRecords(allRecords, page, limit);
+    const filteredRecords = filterFlightRecords(allRecords, searchQuery);
+    const paged = paginateFlightRecords(filteredRecords, page, limit);
     const summary = listPayload.summary || buildFlightStatsSummary(allRecords, airportIndex);
 
     return jsonWithSession({
       ok: true,
       records: paged.records,
       pagination: paged.pagination,
+      search: {
+        query: searchQuery,
+        active: Boolean(searchQuery),
+        total_records: allRecords.length,
+        matched_records: filteredRecords.length
+      },
       summary,
       sort: listPayload.sort || {
         key: "flight_date",

@@ -22,6 +22,8 @@ let mobileCurrentPage = 1;
 let mobileLoading = false;
 let mobileAirportIndexPromise = null;
 let mobileDistanceRequestId = 0;
+let mobileListRequestId = 0;
+let mobileSearchTimer = null;
 
 function escapeMobileHtml(value) {
   return String(value ?? "")
@@ -190,17 +192,6 @@ function normalizedMobileRecord(record) {
   };
 }
 
-function routeSearchText(record) {
-  const r = normalizedMobileRecord(record);
-  return Object.values(r).join(" ").toLowerCase();
-}
-
-function filteredMobileRecords() {
-  const keyword = mobileFilterText.value.trim().toLowerCase();
-  if (!keyword) return mobileRecords;
-  return mobileRecords.filter((record) => routeSearchText(record).includes(keyword));
-}
-
 function mobileFlightCard(record, options = {}) {
   const r = normalizedMobileRecord(record);
   const date = formatDateParts(r.flight_date);
@@ -256,7 +247,7 @@ function updateMobilePager(shown) {
 }
 
 function renderMobileFlights() {
-  const rows = filteredMobileRecords();
+  const rows = mobileRecords;
   if (!rows.length) {
     mobileRecordsList.innerHTML = '<p class="mobile-muted">No flight records found.</p>';
     updateMobilePager(0);
@@ -268,18 +259,22 @@ function renderMobileFlights() {
 
 function buildMobileListUrl(page) {
   const url = new URL(MOBILE_API_LIST_URL, window.location.href);
+  const query = mobileFilterText.value.trim().replace(/\s+/g, " ");
   url.searchParams.set("limit", mobilePageLimit.value || "10");
   url.searchParams.set("page", String(page || 1));
+  if (query) url.searchParams.set("q", query);
   return url.toString();
 }
 
 async function loadMobilePage(page = 1) {
+  const requestId = ++mobileListRequestId;
   setMobileLoading(true);
-  setMobileListStatus("Loading");
+  setMobileListStatus(mobileFilterText.value.trim() ? "Searching" : "Loading");
   mobileRecordsList.innerHTML = '<p class="mobile-muted">Loading...</p>';
   try {
     const response = await fetch(buildMobileListUrl(page), { headers: { accept: "application/json" } });
     const result = await response.json().catch(() => null);
+    if (requestId !== mobileListRequestId) return;
     if (!response.ok || !result || !result.ok) throw new Error(result?.error || `HTTP ${response.status}`);
     mobileRecords = Array.isArray(result.records) ? result.records : [];
     mobilePagination = result.pagination || mobilePagination;
@@ -288,13 +283,14 @@ async function loadMobilePage(page = 1) {
     hydrateMobileDistance(result.summary || {});
     renderMobileFlights();
   } catch (error) {
+    if (requestId !== mobileListRequestId) return;
     mobileRecords = [];
     mobileDistanceRequestId += 1;
     setMobileSummary();
     mobileRecordsList.innerHTML = `<p class="mobile-muted">${escapeMobileHtml("Failed to load flights: " + error.message)}</p>`;
     setMobileListStatus("Offline / API unavailable", "error");
   } finally {
-    setMobileLoading(false);
+    if (requestId === mobileListRequestId) setMobileLoading(false);
   }
 }
 
@@ -331,7 +327,10 @@ mobileRecordsList.addEventListener("click", (event) => {
   if (button) deleteMobileRecord(button.dataset.deleteId, button.dataset.deleteNo);
 });
 mobileFilterToggle.addEventListener("click", () => setMobileFilterOpen(mobileFilterPanel.hidden));
-mobileFilterText.addEventListener("input", renderMobileFlights);
+mobileFilterText.addEventListener("input", () => {
+  window.clearTimeout(mobileSearchTimer);
+  mobileSearchTimer = window.setTimeout(() => loadMobilePage(1), 220);
+});
 mobileFilterText.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMobileFilterOpen(false);
 });
