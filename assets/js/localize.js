@@ -217,6 +217,8 @@
         "No": "无",
         "Page -": "第 - 页",
         "Homepage": "主页",
+        "Visit Homepage": "访问主页",
+        "Licensed under the Apache License 2.0.": "基于 Apache License 2.0 授权。",
         "Licensed under the Apache License 2.0. Static aviation and map data are provided for personal log visualization only.": "基于 Apache License 2.0 授权。静态航空与地图数据仅用于个人日志可视化。"
       },
       replacements: [
@@ -528,6 +530,8 @@
         "No": "なし",
         "Page -": "ページ -",
         "Homepage": "ホームページ",
+        "Visit Homepage": "ホームページを見る",
+        "Licensed under the Apache License 2.0.": "Apache License 2.0 の下でライセンスされています。",
         "Licensed under the Apache License 2.0. Static aviation and map data are provided for personal log visualization only.": "Apache License 2.0 の下でライセンスされています。静的な航空・地図データは個人ログの可視化目的でのみ使用します。"
       },
       replacements: [

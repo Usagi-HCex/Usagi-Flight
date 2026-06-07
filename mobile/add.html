@@ -60,7 +60,7 @@
         <h2>Flight</h2>
         <div class="mobile-field-stack">
           <label for="flight_number">Flight Number</label>
-          <input id="flight_number" required data-uppercase inputmode="text" placeholder="UO0652" />
+          <input id="flight_number" required data-uppercase inputmode="text" placeholder="JL0001" />
           <label for="flight_date">Date</label>
           <input id="flight_date" type="date" required />
           <label for="flight_type">Type</label>
@@ -80,13 +80,13 @@
         <h2>Route</h2>
         <div class="mobile-route-form-grid">
           <label for="departure_station">From</label>
-          <input id="departure_station" required maxlength="8" data-uppercase inputmode="text" placeholder="HKG" />
+          <input id="departure_station" required maxlength="8" data-uppercase inputmode="text" placeholder="HND" />
           <label for="departure_terminal">Terminal</label>
           <input id="departure_terminal" inputmode="text" placeholder="T1" />
           <label for="departure_time">Time</label>
           <input id="departure_time" type="time" />
           <label for="arrival_station">To</label>
-          <input id="arrival_station" required maxlength="8" data-uppercase inputmode="text" placeholder="NRT" />
+          <input id="arrival_station" required maxlength="8" data-uppercase inputmode="text" placeholder="HKG" />
           <label for="arrival_terminal">Terminal</label>
           <input id="arrival_terminal" inputmode="text" placeholder="T3" />
           <label for="arrival_time">Time</label>
@@ -117,7 +117,10 @@
         <button id="mobileSubmitBtn" class="mobile-submit-btn" type="submit">Save Flight</button>
       </section>
     </form>
-    <footer class="mobile-footer-note">© 2026 <a href="https://github.com/Usagi-HCex" target="_blank" rel="noopener noreferrer">Usagi-HCex</a></footer>
+    <footer class="mobile-footer-note">
+      <span class="mobile-footer-line">© 2026 <a href="https://github.com/Usagi-HCex" target="_blank" rel="noopener noreferrer">Usagi-HCex</a>. <a href="https://usagi-hecex.pages.dev/" target="_blank" rel="noopener noreferrer">Visit Homepage</a>.</span>
+      <span class="mobile-footer-line">Licensed under the Apache License 2.0.</span>
+    </footer>
   </main>
 
   <nav class="mobile-tabbar" aria-label="Mobile navigation">

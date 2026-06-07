@@ -27,7 +27,7 @@
         <section class="card">
           <h2>Flight Identity</h2>
           <div class="fields">
-            <div><label for="flight_number">Flight Number</label><input id="flight_number" required data-uppercase placeholder="JL001 / NH217" /></div>
+            <div><label for="flight_number">Flight Number</label><input id="flight_number" required data-uppercase placeholder="JL0001" /></div>
             <div><label for="aircraft_model">Aircraft Model</label><input id="aircraft_model" data-uppercase placeholder="B789 / A359" /></div>
             <div><label for="flight_type">Flight Type</label><select id="flight_type"><option value="">Select flight type</option><option value="International">International</option><option value="Domestic">Domestic</option><option value="Regional">Regional(HK, MO, TW)</option><option value="Special">Special</option></select></div>
             <div><label for="flight_date">Date (Local Time)</label><input id="flight_date" type="date" required /></div>
@@ -45,10 +45,10 @@
         <section class="card full">
           <h2>Route & Time</h2>
           <div class="route-fields">
-            <div><label for="departure_station">Departure Station</label><input id="departure_station" required maxlength="8" data-uppercase placeholder="SDJ / RJSS" /></div>
+            <div><label for="departure_station">Departure Station</label><input id="departure_station" required maxlength="8" data-uppercase placeholder="HND" /></div>
             <div><label for="departure_terminal">Departure Terminal</label><input id="departure_terminal" placeholder="I / T1 / Terminal 1" /></div>
             <div><label for="departure_time">Departure Time</label><input id="departure_time" type="time" /></div>
-            <div><label for="arrival_station">Arrival Station</label><input id="arrival_station" required maxlength="8" data-uppercase placeholder="HKG / VHHH" /></div>
+            <div><label for="arrival_station">Arrival Station</label><input id="arrival_station" required maxlength="8" data-uppercase placeholder="HKG" /></div>
             <div><label for="arrival_terminal">Arrival Terminal</label><input id="arrival_terminal" placeholder="T1 / T2" /></div>
             <div><label for="arrival_time">Arrival Time</label><input id="arrival_time" type="time" /></div>
           </div>
