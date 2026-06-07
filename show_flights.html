@@ -22,7 +22,7 @@
     <section class="panel">
       <div class="toolbar">
         <div class="controls"><label for="pageLimit">Records per page</label><select id="pageLimit"><option value="10" selected>10</option><option value="20">20</option><option value="50">50</option></select><button id="applyPageLimitBtn" class="btn" type="button">Apply</button></div>
-        <div class="controls"><label for="filterText">Filter current page</label><input id="filterText" type="text" placeholder="JL001 / HND / T1 / B789" /><button id="clearFilterBtn" class="btn" type="button">Clear</button><button id="refreshBtn" class="btn" type="button">Refresh</button><button id="forceRebuildBtn" class="btn" type="button">Rebuild Cache</button></div>
+        <div class="controls"><label for="filterText">Search all records</label><input id="filterText" type="text" placeholder="JL001 / HND / T1 / B789" /><button id="clearFilterBtn" class="btn" type="button">Clear</button><button id="refreshBtn" class="btn" type="button">Refresh</button><button id="forceRebuildBtn" class="btn" type="button">Rebuild Cache</button></div>
       </div>
       <div class="table-scroll"><table><thead><tr><th>No.</th><th>Date</th><th>Flight No.</th><th>A/C Type</th><th>Departure</th><th>Arrival</th><th>Actions</th></tr></thead><tbody id="recordsBody"><tr><td colspan="7">Loading flight records...</td></tr></tbody></table></div>
       <div class="pagination status-line"><div class="page-buttons"><button id="firstPageBtn" class="btn" type="button" disabled>First Page</button><button id="prevPageBtn" class="btn" type="button" disabled>Previous</button><button id="nextPageBtn" class="btn" type="button" disabled>Next</button></div><div id="statusChip" class="status status-inline">Ready</div></div>
