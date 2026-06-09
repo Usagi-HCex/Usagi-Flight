@@ -7,10 +7,14 @@ const mobileSingleMapStatus = document.getElementById("mobileSingleMapStatus");
 const mobileRouteDistance = document.getElementById("mobileRouteDistance");
 const mobileAirlineName = document.getElementById("mobileAirlineName");
 
+const MOBILE_FLIGHT_SNAPSHOT_PREFIX = "flight_mobile_record_snapshot:";
+const MOBILE_FLIGHT_SNAPSHOT_TTL_MS = 5 * 60000;
+
 let mobileDetailMapController = null;
 let mobileLoadedRecord = null;
 let mobileAirportIndexPromise = null;
 let mobileAirlineIndexPromise = null;
+let mobileMapRouteKey = "";
 
 function escapeDetailHtml(value) {
   return String(value ?? "")
@@ -39,6 +43,40 @@ function getMobileRecordId() {
   const id = Number(new URLSearchParams(window.location.search).get("id"));
   if (!Number.isInteger(id) || id <= 0) throw new Error("Invalid record reference");
   return id;
+}
+
+function mobileFlightSnapshotKey(id) {
+  return MOBILE_FLIGHT_SNAPSHOT_PREFIX + String(id || "");
+}
+
+function readMobileFlightSnapshot(id) {
+  if (!id) return null;
+  try {
+    const raw = window.sessionStorage?.getItem(mobileFlightSnapshotKey(id));
+    if (!raw) return null;
+    const snapshot = JSON.parse(raw);
+    const ttl = Number(snapshot.ttl || MOBILE_FLIGHT_SNAPSHOT_TTL_MS);
+    if (!snapshot.record || Date.now() - Number(snapshot.storedAt || 0) > ttl) {
+      window.sessionStorage?.removeItem(mobileFlightSnapshotKey(id));
+      return null;
+    }
+    return snapshot.record;
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeMobileFlightSnapshot(record) {
+  if (!record?.id) return;
+  try {
+    window.sessionStorage?.setItem(mobileFlightSnapshotKey(record.id), JSON.stringify({
+      storedAt: Date.now(),
+      ttl: MOBILE_FLIGHT_SNAPSHOT_TTL_MS,
+      record
+    }));
+  } catch (error) {
+    // Best-effort speed path.
+  }
 }
 
 function setDetailText(id, value, fallback = "-") {
@@ -186,6 +224,21 @@ function fillAirportNames(record, airportIndex) {
   setTimeout(refreshAirportNameMarquee, 80);
 }
 
+function mobileRouteKey(record) {
+  return [
+    airportLookupCode(record.departure_station),
+    airportLookupCode(record.arrival_station)
+  ].join(">");
+}
+
+function afterNextPaint(callback) {
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(() => window.setTimeout(callback, 0));
+    return;
+  }
+  window.setTimeout(callback, 0);
+}
+
 function renderDetailFields(record) {
   const rows = [
     ["Record No.", record.record_no ?? record.id],
@@ -208,45 +261,81 @@ function renderDetailFields(record) {
 }
 
 async function drawMobileSingleMap(record) {
-  mobileDetailMapController = FlightMapToolkit.createController({
-    canvas: mobileSingleMap,
-    statusElement: mobileSingleMapStatus,
-    mapOptions: { showAirportLabels: true, showLand: true, showAirports: true, showRoutes: true }
-  });
+  const routeKey = mobileRouteKey(record);
+  if (routeKey && routeKey === mobileMapRouteKey && mobileDetailMapController) return;
+
+  if (!mobileDetailMapController) {
+    mobileDetailMapController = FlightMapToolkit.createController({
+      canvas: mobileSingleMap,
+      statusElement: mobileSingleMapStatus,
+      mapOptions: { showAirportLabels: true, showLand: true, showAirports: true, showRoutes: true }
+    });
+  }
+
   try {
     const index = await loadMobileAirportIndex();
     const built = FlightMapToolkit.buildRouteFromRecord(record, index, { highlight: true, thin: true });
     if (!built.ok) {
       mobileSingleMapStatus.textContent = "Airport coordinate not found: " + built.missing.join(", ");
+      mobileMapRouteKey = "";
       return;
     }
     mobileDetailMapController.setData([{ ...built.route, highlight: true, thin: true }], {});
+    mobileMapRouteKey = routeKey;
   } catch (error) {
+    mobileMapRouteKey = "";
     mobileSingleMapStatus.textContent = "Failed to draw map: " + error.message;
   }
 }
 
+function hydrateMobileDetailVisuals(record) {
+  fillMobileAirlineName(record).catch(() => {});
+  loadMobileAirportIndex()
+    .then((index) => {
+      fillAirportNames(record, index);
+      afterNextPaint(() => {
+        drawMobileSingleMap(record).catch(() => {});
+      });
+    })
+    .catch(() => {
+      if (mobileRouteDistance) mobileRouteDistance.textContent = "-";
+    });
+}
+
+function applyMobileRecord(record, status = "Ready") {
+  mobileLoadedRecord = record || {};
+  fillDetailHero(mobileLoadedRecord);
+  renderDetailFields(mobileLoadedRecord);
+  setMobileDetailStatus(status);
+  hydrateMobileDetailVisuals(mobileLoadedRecord);
+}
+
 async function loadMobileRecord() {
+  let cachedRecord = null;
   try {
     const id = getMobileRecordId();
     mobileEditLink.href = `./edit.html?id=${encodeURIComponent(id)}`;
+    cachedRecord = readMobileFlightSnapshot(id);
+    if (cachedRecord) {
+      applyMobileRecord(cachedRecord, "Updating");
+    } else {
+      setMobileDetailStatus("Loading");
+    }
+
     const url = new URL(MOBILE_SINGLE_API_URL, window.location.href);
     url.searchParams.set("id", String(id));
     const response = await fetch(url.toString(), { headers: { accept: "application/json" } });
     const result = await response.json().catch(() => null);
     if (!response.ok || !result || !result.ok) throw new Error(result?.error || `HTTP ${response.status}`);
-    mobileLoadedRecord = result.record || {};
-    fillDetailHero(mobileLoadedRecord);
-    await fillMobileAirlineName(mobileLoadedRecord);
-    renderDetailFields(mobileLoadedRecord);
-    setMobileDetailStatus("Ready");
-    try {
-      fillAirportNames(mobileLoadedRecord, await loadMobileAirportIndex());
-    } catch (error) {
-      if (mobileRouteDistance) mobileRouteDistance.textContent = "-";
-    }
-    await drawMobileSingleMap(mobileLoadedRecord);
+    const record = result.record || {};
+    writeMobileFlightSnapshot(record);
+    applyMobileRecord(record, "Ready");
   } catch (error) {
+    if (cachedRecord) {
+      setMobileDetailStatus("Cached");
+      console.warn("Failed to refresh mobile flight detail", error);
+      return;
+    }
     setMobileDetailStatus("Failed: " + error.message, "error");
     if (mobileRouteDistance) mobileRouteDistance.textContent = "-";
     if (mobileAirlineName) mobileAirlineName.hidden = true;
