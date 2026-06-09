@@ -100,7 +100,7 @@ export async function onRequestPut(context) {
         data_iv = ?,
         ciphertext = ?,
         hmac_value_blob = ?,
-        payload_version = 2,
+        payload_version = 3,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(

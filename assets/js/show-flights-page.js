@@ -41,10 +41,15 @@ function setStatus(message) {
   statusChip.textContent = message || "Ready";
 }
 
-function joinStationTerminalTime(station, terminal, time) {
+function isYes(value) {
+  return String(value || "").trim().toLowerCase() === "yes";
+}
+
+function joinStationTerminalTime(station, terminal, time, nextDay = "No") {
   const s = String(station ?? "").trim();
   const t = String(terminal ?? "").trim();
-  const tm = String(time ?? "").trim();
+  const rawTime = String(time ?? "").trim();
+  const tm = rawTime && isYes(nextDay) ? `${rawTime} +1 Day` : rawTime;
   return [s, t, tm].filter(Boolean).join(" ") || "-";
 }
 
@@ -80,7 +85,7 @@ function normalizeRecord(record) {
     flight_number: record?.flight_number ?? "",
     aircraft_model: record?.aircraft_model ?? "",
     departure: joinStationTerminalTime(record?.departure_station, record?.departure_terminal, record?.departure_time),
-    arrival: joinStationTerminalTime(record?.arrival_station, record?.arrival_terminal, record?.arrival_time)
+    arrival: joinStationTerminalTime(record?.arrival_station, record?.arrival_terminal, record?.arrival_time, record?.arrival_next_day)
   };
 }
 

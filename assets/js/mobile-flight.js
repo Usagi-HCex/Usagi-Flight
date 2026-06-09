@@ -26,6 +26,15 @@ function displayDetail(value, fallback = "-") {
   return text || fallback;
 }
 
+function isYes(value) {
+  return String(value || "").trim().toLowerCase() === "yes";
+}
+
+function mobileArrivalTimeText(record) {
+  const time = displayDetail(record.arrival_time, "--:--");
+  return isYes(record.arrival_next_day) && time !== "--:--" ? `${time} +1 Day` : time;
+}
+
 function getMobileRecordId() {
   const id = Number(new URLSearchParams(window.location.search).get("id"));
   if (!Number.isInteger(id) || id <= 0) throw new Error("Invalid record reference");
@@ -163,7 +172,7 @@ function fillDetailHero(record) {
   setDetailText("mobileDepartureTime", record.departure_time, "--:--");
   setDetailText("mobileDepartureStation", record.departure_station);
   setDetailText("mobileDepartureTerminal", record.departure_terminal);
-  setDetailText("mobileArrivalTime", record.arrival_time, "--:--");
+  setDetailText("mobileArrivalTime", mobileArrivalTimeText(record), "--:--");
   setDetailText("mobileArrivalStation", record.arrival_station);
   setDetailText("mobileArrivalTerminal", record.arrival_terminal);
 }
@@ -181,7 +190,10 @@ function renderDetailFields(record) {
   const rows = [
     ["Record No.", record.record_no ?? record.id],
     ["Aircraft", record.aircraft_model],
+    ["Arrival +1 Day", isYes(record.arrival_next_day) ? "Yes" : "No"],
     ["Baggage", record.baggage_no_weight],
+    ["Additional Fares", isYes(record.additional_fares) ? "Yes" : "No"],
+    ["Additional Fares Detail", record.additional_fares_detail],
     ["Remarks", record.remarks],
     ["HMAC", record.hmac_value],
     ["Created (UTC)", record.created_at],

@@ -39,6 +39,15 @@ function displayMobile(value, fallback = "-") {
   return text || fallback;
 }
 
+function isYes(value) {
+  return String(value || "").trim().toLowerCase() === "yes";
+}
+
+function mobileTimeText(time, nextDay = "No") {
+  const text = displayMobile(time, "--:--");
+  return isYes(nextDay) && text !== "--:--" ? `${text} +1` : text;
+}
+
 function formatMobileStat(value) {
   const number = Number(value);
   if (!Number.isFinite(number)) return "-";
@@ -188,7 +197,8 @@ function normalizedMobileRecord(record) {
     departure_time: record?.departure_time ?? "",
     arrival_station: record?.arrival_station ?? "",
     arrival_terminal: record?.arrival_terminal ?? "",
-    arrival_time: record?.arrival_time ?? ""
+    arrival_time: record?.arrival_time ?? "",
+    arrival_next_day: record?.arrival_next_day ?? "No"
   };
 }
 
@@ -214,7 +224,7 @@ function mobileFlightCard(record, options = {}) {
             <time>${escapeMobileHtml(displayMobile(r.departure_time, "--:--"))}</time>
             <span class="mobile-dot depart" aria-hidden="true"></span>
             <strong>${escapeMobileHtml(stationLabel(r.departure_station, r.departure_terminal))}</strong>
-            <time>${escapeMobileHtml(displayMobile(r.arrival_time, "--:--"))}</time>
+            <time>${escapeMobileHtml(mobileTimeText(r.arrival_time, r.arrival_next_day))}</time>
             <span class="mobile-dot arrive" aria-hidden="true"></span>
             <strong>${escapeMobileHtml(stationLabel(r.arrival_station, r.arrival_terminal))}</strong>
           </div>

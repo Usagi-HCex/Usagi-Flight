@@ -31,7 +31,10 @@ function trimRecord(record) {
     arrival_station: record.arrival_station || "",
     arrival_terminal: record.arrival_terminal || "",
     arrival_time: record.arrival_time || "",
-    baggage_no_weight: record.baggage_no_weight || ""
+    arrival_next_day: record.arrival_next_day || "No",
+    baggage_no_weight: record.baggage_no_weight || "",
+    additional_fares: record.additional_fares || "No",
+    additional_fares_detail: record.additional_fares_detail || ""
   };
 }
 

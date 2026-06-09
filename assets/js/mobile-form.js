@@ -15,6 +15,9 @@ const mobileBarcodeVideo = document.getElementById("mobileBarcodeVideo");
 const mobileBarcodeImage = document.getElementById("mobileBarcodeImage");
 const baggageStatus = document.getElementById("baggage_status");
 const baggageDetail = document.getElementById("baggage_no_weight");
+const arrivalNextDay = document.getElementById("arrival_next_day");
+const additionalFaresStatus = document.getElementById("additional_fares_status");
+const additionalFaresDetail = document.getElementById("additional_fares_detail");
 const mobileViewLink = document.getElementById("mobileViewLink");
 
 const BCBP_HEADER_LENGTH = 23;
@@ -85,6 +88,17 @@ function updateBaggageState() {
   baggageDetail.disabled = !enabled;
   baggageDetail.required = enabled;
   if (!enabled) baggageDetail.value = "";
+}
+
+function updateAdditionalFaresState() {
+  const enabled = additionalFaresStatus.value === "Yes";
+  additionalFaresDetail.disabled = !enabled;
+  additionalFaresDetail.required = enabled;
+  if (!enabled) additionalFaresDetail.value = "";
+}
+
+function isYes(value) {
+  return String(value || "").trim().toLowerCase() === "yes";
 }
 
 function normalizeBcbpText(value) {
@@ -484,7 +498,10 @@ function getPayload() {
     arrival_station: fieldValue("arrival_station").toUpperCase(),
     arrival_terminal: fieldValue("arrival_terminal"),
     arrival_time: fieldValue("arrival_time"),
+    arrival_next_day: arrivalNextDay.checked ? "Yes" : "No",
     baggage_no_weight: baggageStatus.value === "Yes" ? fieldValue("baggage_no_weight").toUpperCase() : "No",
+    additional_fares: additionalFaresStatus.value,
+    additional_fares_detail: additionalFaresStatus.value === "Yes" ? fieldValue("additional_fares_detail") : "",
     remarks: fieldValue("remarks")
   };
 }
@@ -495,6 +512,7 @@ function validatePayload(payload) {
   if (!payload.departure_station) return "Departure Station is required.";
   if (!payload.arrival_station) return "Arrival Station is required.";
   if (baggageStatus.value === "Yes" && !payload.baggage_no_weight) return "Baggage Detail is required.";
+  if (additionalFaresStatus.value === "Yes" && !payload.additional_fares_detail) return "Additional Fares Detail is required.";
   return "";
 }
 
@@ -509,6 +527,7 @@ function fillForm(record) {
   setField("arrival_station", record.arrival_station);
   setField("arrival_terminal", record.arrival_terminal);
   setField("arrival_time", record.arrival_time);
+  if (arrivalNextDay) arrivalNextDay.checked = isYes(record.arrival_next_day);
   setField("remarks", record.remarks);
 
   const baggage = String(record.baggage_no_weight || "").trim();
@@ -522,6 +541,11 @@ function fillForm(record) {
     baggageDetail.value = "";
   }
   updateBaggageState();
+
+  const hasAdditionalFares = isYes(record.additional_fares) || Boolean(String(record.additional_fares_detail || "").trim());
+  additionalFaresStatus.value = hasAdditionalFares ? "Yes" : "No";
+  additionalFaresDetail.value = hasAdditionalFares ? String(record.additional_fares_detail || "").trim() : "";
+  updateAdditionalFaresState();
 }
 
 function getRecordId() {
@@ -586,6 +610,7 @@ async function submitForm(event) {
 
 document.querySelectorAll("[data-uppercase]").forEach((input) => input.addEventListener("input", () => upper(input)));
 baggageStatus.addEventListener("change", updateBaggageState);
+additionalFaresStatus.addEventListener("change", updateAdditionalFaresState);
 mobileFlightForm.addEventListener("submit", submitForm);
 mobileParseBcbpBtn.addEventListener("click", parseAndApplyBcbp);
 mobileApplyLegBtn.addEventListener("click", () => {
@@ -601,4 +626,5 @@ document.addEventListener("visibilitychange", () => {
 });
 
 updateBaggageState();
+updateAdditionalFaresState();
 loadRecord();

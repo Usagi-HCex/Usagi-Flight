@@ -35,10 +35,12 @@
         </section>
 
         <section class="card">
-          <h2>Baggage</h2>
+          <h2>Baggage & Additional Fares</h2>
           <div class="fields">
             <div><label for="baggage_status">Baggage</label><select id="baggage_status"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>
             <div><label for="baggage_no_weight">Baggage Detail</label><input id="baggage_no_weight" placeholder="1PC/23KG" disabled data-uppercase /></div>
+            <div><label for="additional_fares_status">Additional Fares</label><select id="additional_fares_status"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>
+            <div><label for="additional_fares_detail">Additional Fares Detail</label><input id="additional_fares_detail" placeholder="Seat / upgrade / tax" disabled /></div>
           </div>
         </section>
 
@@ -50,7 +52,7 @@
             <div><label for="departure_time">Departure Time</label><input id="departure_time" type="time" /></div>
             <div><label for="arrival_station">Arrival Station</label><input id="arrival_station" required maxlength="8" data-uppercase placeholder="HKG" /></div>
             <div><label for="arrival_terminal">Arrival Terminal</label><input id="arrival_terminal" placeholder="T1 / T2" /></div>
-            <div><label for="arrival_time">Arrival Time</label><input id="arrival_time" type="time" /></div>
+            <div class="time-next-day-field"><label for="arrival_time">Arrival Time</label><div class="time-with-flag"><input id="arrival_time" type="time" /><label class="next-day-toggle" for="arrival_next_day"><input id="arrival_next_day" type="checkbox" /><span>+1 Day</span></label></div></div>
           </div>
         </section>
 
