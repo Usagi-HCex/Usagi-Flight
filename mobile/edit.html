@@ -92,11 +92,13 @@
           <input id="arrival_terminal" inputmode="text" />
           <label for="arrival_time">Time</label>
           <input id="arrival_time" type="time" />
+          <label for="arrival_next_day">Arrival Day</label>
+          <label class="mobile-next-day-toggle" for="arrival_next_day"><input id="arrival_next_day" type="checkbox" /><span>+1 Day</span></label>
         </div>
       </section>
 
       <section class="mobile-form-card">
-        <h2>Baggage</h2>
+        <h2>Baggage & Additional Fares</h2>
         <div class="mobile-field-stack">
           <label for="baggage_status">Baggage</label>
           <select id="baggage_status">
@@ -105,6 +107,13 @@
           </select>
           <label for="baggage_no_weight">Detail</label>
           <input id="baggage_no_weight" data-uppercase inputmode="text" disabled />
+          <label for="additional_fares_status">Additional Fares</label>
+          <select id="additional_fares_status">
+            <option value="No" selected>No</option>
+            <option value="Yes">Yes</option>
+          </select>
+          <label for="additional_fares_detail">Fare Detail</label>
+          <input id="additional_fares_detail" inputmode="text" disabled />
         </div>
       </section>
 

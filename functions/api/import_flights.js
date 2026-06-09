@@ -1,4 +1,5 @@
 import {
+  calculateLegacyFlightHmac,
   calculateFlightHmac,
   encryptFlightPayload,
   sanitizeFlightPayload
@@ -62,7 +63,7 @@ async function insertRecord(session, encrypted) {
       hmac_value_blob,
       payload_version
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, 2)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 3)
   `).bind(
     recordNo,
     encrypted.record_uuid,
@@ -77,6 +78,12 @@ async function insertRecord(session, encrypted) {
     id: result.meta?.last_row_id ?? null,
     record_no: recordNo
   };
+}
+
+function canUseLegacyHmac(payload) {
+  return payload.arrival_next_day !== "Yes" &&
+    payload.additional_fares !== "Yes" &&
+    !payload.additional_fares_detail;
 }
 
 export async function onRequestPost(context) {
@@ -101,16 +108,21 @@ export async function onRequestPost(context) {
         const payload = sanitizeFlightPayload(records[index]);
         validateRequiredFields(payload);
         const hmacValue = await calculateFlightHmac(payload, context.env);
+        const legacyHmacValue = canUseLegacyHmac(payload)
+          ? await calculateLegacyFlightHmac(payload, context.env)
+          : "";
 
-        if (seenHmac.has(hmacValue)) {
+        if (seenHmac.has(hmacValue) || (legacyHmacValue && seenHmac.has(legacyHmacValue))) {
           skippedDuplicates += 1;
           duplicates.push({ row: index + 1, duplicate_scope: "csv", hmac_value: hmacValue });
           continue;
         }
 
-        const existing = await findExistingByHmac(d1.session, hmacValue);
+        const existing = await findExistingByHmac(d1.session, hmacValue) ||
+          (legacyHmacValue ? await findExistingByHmac(d1.session, legacyHmacValue) : null);
         if (existing) {
           seenHmac.add(hmacValue);
+          if (legacyHmacValue) seenHmac.add(legacyHmacValue);
           skippedDuplicates += 1;
           duplicates.push({
             row: index + 1,
@@ -125,6 +137,7 @@ export async function onRequestPost(context) {
         const encrypted = await encryptFlightPayload(payload, context.env);
         const row = await insertRecord(d1.session, encrypted);
         seenHmac.add(hmacValue);
+        if (legacyHmacValue) seenHmac.add(legacyHmacValue);
         inserted += 1;
         imported.push({
           row: index + 1,

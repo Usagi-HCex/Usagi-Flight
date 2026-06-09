@@ -82,7 +82,10 @@ function buildRecordSearchText(record) {
     record?.arrival_station,
     record?.arrival_terminal,
     record?.arrival_time,
+    record?.arrival_next_day,
     record?.baggage_no_weight,
+    record?.additional_fares,
+    record?.additional_fares_detail,
     record?.hmac_value,
     record?.created_at,
     record?.updated_at
@@ -173,7 +176,7 @@ export async function onRequestPost(context) {
         hmac_value_blob,
         payload_version
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, 2)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 3)
     `).bind(
       recordNo,
       encrypted.record_uuid,

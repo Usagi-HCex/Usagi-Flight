@@ -1,7 +1,7 @@
 const API_SINGLE_URL = "./api/flight";
 const statusMessage = document.getElementById("statusMessage");
 const editLink = document.getElementById("editLink");
-const fields = ["record_no", "payload_version", "flight_number", "aircraft_model", "flight_type", "flight_date", "departure_station", "departure_terminal", "departure_time", "arrival_station", "arrival_terminal", "arrival_time", "baggage_no_weight", "remarks", "hmac_value", "created_at", "updated_at"];
+const fields = ["record_no", "payload_version", "flight_number", "aircraft_model", "flight_type", "flight_date", "departure_station", "departure_terminal", "departure_time", "arrival_station", "arrival_terminal", "arrival_time", "arrival_next_day", "baggage_no_weight", "additional_fares", "additional_fares_detail", "remarks", "hmac_value", "created_at", "updated_at"];
 
 let mapController = null;
 let loadedRecord = null;
@@ -26,6 +26,15 @@ function getRecordId() {
 function display(v) {
   const t = v == null ? "" : String(v);
   return t.trim() ? t : "-";
+}
+
+function isYes(value) {
+  return String(value || "").trim().toLowerCase() === "yes";
+}
+
+function arrivalTimeText(record) {
+  const time = display(record.arrival_time);
+  return isYes(record.arrival_next_day) && time !== "-" ? `${time} +1 Day` : time;
 }
 
 function setText(id, v) {
@@ -191,6 +200,9 @@ async function loadRecord() {
     loadedRecord = r;
     fields.forEach((f) => setText(f, r[f]));
     setText("record_no", r.record_no ?? r.id);
+    setText("arrival_time", arrivalTimeText(r));
+    setText("arrival_next_day", isYes(r.arrival_next_day) ? "Yes (+1 Day)" : "No");
+    setText("additional_fares", isYes(r.additional_fares) ? "Yes" : "No");
     await fillAirlineName(r);
     setStatus("Flight record loaded.");
     const index = await fillAirportNames(r).catch(() => {

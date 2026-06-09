@@ -1,7 +1,7 @@
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
-export const FLIGHT_RECORD_FIELDS = [
+export const LEGACY_FLIGHT_RECORD_FIELDS = [
   "flight_number",
   "aircraft_model",
   "flight_type",
@@ -16,12 +16,35 @@ export const FLIGHT_RECORD_FIELDS = [
   "remarks"
 ];
 
+export const FLIGHT_RECORD_FIELDS = [
+  "flight_number",
+  "aircraft_model",
+  "flight_type",
+  "flight_date",
+  "departure_station",
+  "departure_terminal",
+  "departure_time",
+  "arrival_station",
+  "arrival_terminal",
+  "arrival_time",
+  "arrival_next_day",
+  "baggage_no_weight",
+  "additional_fares",
+  "additional_fares_detail",
+  "remarks"
+];
+
 const UPPERCASE_FIELDS = new Set([
   "flight_number",
   "aircraft_model",
   "departure_station",
   "arrival_station",
   "baggage_no_weight"
+]);
+
+const YES_NO_FIELDS = new Set([
+  "arrival_next_day",
+  "additional_fares"
 ]);
 
 function base64ToBytes(base64) {
@@ -131,13 +154,25 @@ function splitStationAndTerminal(stationValue, terminalValue) {
   return { station, terminal };
 }
 
+function normalizeYesNo(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return "No";
+  const normalized = text.toLowerCase().replace(/\s+/g, " ");
+  if (["yes", "y", "true", "1", "+1", "+1 day", "next day"].includes(normalized)) return "Yes";
+  return "No";
+}
+
 export function sanitizeFlightPayload(input) {
   const output = {};
+  const hasExplicitAdditionalFares = input?.additional_fares !== null &&
+    input?.additional_fares !== undefined &&
+    String(input.additional_fares).trim() !== "";
 
   for (const field of FLIGHT_RECORD_FIELDS) {
     const value = input?.[field];
     let normalized = value === null || value === undefined ? "" : String(value).trim();
     if (UPPERCASE_FIELDS.has(field)) normalized = normalized.toUpperCase();
+    if (YES_NO_FIELDS.has(field)) normalized = normalizeYesNo(normalized);
     output[field] = normalized;
   }
 
@@ -149,22 +184,42 @@ export function sanitizeFlightPayload(input) {
   output.arrival_station = arrival.station.toUpperCase();
   output.arrival_terminal = arrival.terminal;
 
-  if (!output.baggage_no_weight) output.baggage_no_weight = "No";
+  output.arrival_next_day = normalizeYesNo(output.arrival_next_day);
+  if (!output.baggage_no_weight || output.baggage_no_weight.toUpperCase() === "NO") output.baggage_no_weight = "No";
+  if (!hasExplicitAdditionalFares && output.additional_fares_detail) {
+    output.additional_fares = "Yes";
+  } else {
+    output.additional_fares = normalizeYesNo(output.additional_fares);
+  }
+  if (output.additional_fares !== "Yes") output.additional_fares_detail = "";
+
   return output;
 }
 
-export function canonicalizeFlightPayload(input) {
+function canonicalizeFlightPayloadFields(input, fields) {
   const payload = sanitizeFlightPayload(input);
   const ordered = {};
-  for (const field of FLIGHT_RECORD_FIELDS) ordered[field] = payload[field];
+  for (const field of fields) ordered[field] = payload[field];
   return JSON.stringify(ordered);
 }
 
-export async function calculateFlightHmac(inputPayload, env) {
+export function canonicalizeFlightPayload(input) {
+  return canonicalizeFlightPayloadFields(input, FLIGHT_RECORD_FIELDS);
+}
+
+async function calculateFlightHmacForFields(inputPayload, env, fields) {
   const key = await importHmacKeyFromEnv(env);
-  const canonical = canonicalizeFlightPayload(inputPayload);
+  const canonical = canonicalizeFlightPayloadFields(inputPayload, fields);
   const signature = await crypto.subtle.sign("HMAC", key, textEncoder.encode(canonical));
   return bytesToHex(new Uint8Array(signature));
+}
+
+export async function calculateFlightHmac(inputPayload, env) {
+  return calculateFlightHmacForFields(inputPayload, env, FLIGHT_RECORD_FIELDS);
+}
+
+export async function calculateLegacyFlightHmac(inputPayload, env) {
+  return calculateFlightHmacForFields(inputPayload, env, LEGACY_FLIGHT_RECORD_FIELDS);
 }
 
 export async function encryptFlightPayload(inputPayload, env, options = {}) {

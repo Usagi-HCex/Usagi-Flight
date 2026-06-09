@@ -17,7 +17,10 @@ const IMPORT_FIELDS = [
   "arrival_station",
   "arrival_terminal",
   "arrival_time",
+  "arrival_next_day",
   "baggage_no_weight",
+  "additional_fares",
+  "additional_fares_detail",
   "remarks"
 ];
 
@@ -155,6 +158,11 @@ function normalizeHeader(value) {
   return String(value || "").trim().replace(/^\uFEFF/, "").toLowerCase();
 }
 
+function normalizeYesNo(value) {
+  const text = String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+  return ["yes", "y", "true", "1", "+1", "+1 day", "next day"].includes(text) ? "Yes" : "No";
+}
+
 function normalizeImportRecord(record) {
   const output = {};
   for (const field of IMPORT_FIELDS) output[field] = String(record[field] ?? "").trim();
@@ -162,7 +170,10 @@ function normalizeImportRecord(record) {
   output.aircraft_model = output.aircraft_model.toUpperCase();
   output.departure_station = output.departure_station.toUpperCase();
   output.arrival_station = output.arrival_station.toUpperCase();
+  output.arrival_next_day = normalizeYesNo(output.arrival_next_day);
   output.baggage_no_weight = output.baggage_no_weight ? output.baggage_no_weight.toUpperCase() : "No";
+  output.additional_fares = normalizeYesNo(output.additional_fares || (output.additional_fares_detail ? "Yes" : "No"));
+  if (output.additional_fares !== "Yes") output.additional_fares_detail = "";
   return output;
 }
 
