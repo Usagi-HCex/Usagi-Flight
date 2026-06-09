@@ -1,4 +1,4 @@
-const CACHE_NAME = "flight-log-pwa-v11";
+const CACHE_NAME = "flight-log-pwa-v12";
 const SHELL_URLS = [
   "./",
   "./index.html",
@@ -96,6 +96,53 @@ async function staleWhileRevalidate(request) {
   return cached || fetchAndCache;
 }
 
+async function navigationSafeResponse(response) {
+  if (!response || (!response.redirected && response.type !== "opaqueredirect")) return response;
+  const status = response.status >= 200 && response.status <= 599 ? response.status : 200;
+  return new Response(await response.clone().arrayBuffer(), {
+    status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
+
+function shellRequestFromCacheKey(cacheKey) {
+  return new Request(cacheKey, {
+    credentials: "same-origin",
+    redirect: "error",
+    headers: {
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    }
+  });
+}
+
+async function staleWhileRevalidateShell(request, cacheKey) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(cacheKey);
+  const shellRequest = shellRequestFromCacheKey(cacheKey);
+  const fetchAndCache = fetch(shellRequest)
+    .then((response) => {
+      if (response.ok && !response.redirected) cache.put(cacheKey, response.clone());
+      return navigationSafeResponse(response);
+    })
+    .catch((error) => {
+      if (cached) return navigationSafeResponse(cached);
+      throw error;
+    });
+  return cached ? navigationSafeResponse(cached) : fetchAndCache;
+}
+
+function shellUrlWithoutSearch(url) {
+  const cacheUrl = new URL(url.href);
+  cacheUrl.search = "";
+  cacheUrl.hash = "";
+  return cacheUrl.href;
+}
+
+function isMobileHtmlShell(url) {
+  return url.pathname.startsWith("/mobile/") && /\.html$/i.test(url.pathname);
+}
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -104,6 +151,10 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (url.pathname.includes("/api/")) return;
+  if (isMobileHtmlShell(url)) {
+    event.respondWith(staleWhileRevalidateShell(request, shellUrlWithoutSearch(url)));
+    return;
+  }
   if (request.mode === "navigate" || /\.html$/i.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;

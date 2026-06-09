@@ -24,6 +24,13 @@ let mobileAirportIndexPromise = null;
 let mobileDistanceRequestId = 0;
 let mobileListRequestId = 0;
 let mobileSearchTimer = null;
+let mobileListAbortController = null;
+
+const MOBILE_LIST_CACHE_TTL_MS = 60000;
+const MOBILE_LIST_CACHE_PREFIX = "flight_mobile_list_cache:";
+const MOBILE_FLIGHT_SNAPSHOT_PREFIX = "flight_mobile_record_snapshot:";
+const MOBILE_FLIGHT_SNAPSHOT_TTL_MS = 5 * 60000;
+const mobileListCache = new Map();
 
 function escapeMobileHtml(value) {
   return String(value ?? "")
@@ -46,6 +53,14 @@ function isYes(value) {
 function mobileTimeText(time, nextDay = "No") {
   const text = displayMobile(time, "--:--");
   return isYes(nextDay) && text !== "--:--" ? `${text} +1` : text;
+}
+
+function mobileTimeHtml(time, nextDay = "No") {
+  const text = displayMobile(time, "--:--");
+  const escaped = escapeMobileHtml(text);
+  return isYes(nextDay) && text !== "--:--"
+    ? `${escaped}<span class="mobile-next-day-badge">+1</span>`
+    : escaped;
 }
 
 function formatMobileStat(value) {
@@ -198,8 +213,94 @@ function normalizedMobileRecord(record) {
     arrival_station: record?.arrival_station ?? "",
     arrival_terminal: record?.arrival_terminal ?? "",
     arrival_time: record?.arrival_time ?? "",
-    arrival_next_day: record?.arrival_next_day ?? "No"
+    arrival_next_day: record?.arrival_next_day ?? "No",
+    baggage_no_weight: record?.baggage_no_weight ?? "",
+    additional_fares: record?.additional_fares ?? "No",
+    additional_fares_detail: record?.additional_fares_detail ?? "",
+    hmac_value: record?.hmac_value ?? "",
+    created_at: record?.created_at ?? "",
+    updated_at: record?.updated_at ?? ""
   };
+}
+
+function mobileListStorageKey(key) {
+  return MOBILE_LIST_CACHE_PREFIX + encodeURIComponent(key);
+}
+
+function readMobileListCache(key) {
+  const memoryCached = mobileListCache.get(key);
+  if (memoryCached && Date.now() - memoryCached.storedAt <= MOBILE_LIST_CACHE_TTL_MS) return memoryCached.result;
+  if (memoryCached) mobileListCache.delete(key);
+
+  try {
+    const raw = window.sessionStorage?.getItem(mobileListStorageKey(key));
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (!cached?.result || Date.now() - Number(cached.storedAt || 0) > MOBILE_LIST_CACHE_TTL_MS) {
+      window.sessionStorage?.removeItem(mobileListStorageKey(key));
+      return null;
+    }
+    mobileListCache.set(key, { storedAt: Number(cached.storedAt || Date.now()), result: cached.result });
+    return cached.result;
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeMobileListCache(key, result) {
+  if (!key || !result) return;
+  const entry = { storedAt: Date.now(), result };
+  mobileListCache.set(key, entry);
+  if (mobileListCache.size > 24) {
+    const firstKey = mobileListCache.keys().next().value;
+    mobileListCache.delete(firstKey);
+  }
+  try {
+    window.sessionStorage?.setItem(mobileListStorageKey(key), JSON.stringify(entry));
+  } catch (error) {
+    // The cache is a best-effort speed path.
+  }
+}
+
+function clearMobileListCache() {
+  mobileListCache.clear();
+  try {
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.sessionStorage.key(index);
+      if (key?.startsWith(MOBILE_LIST_CACHE_PREFIX)) window.sessionStorage.removeItem(key);
+    }
+  } catch (error) {}
+}
+
+function mobileFlightSnapshotKey(id) {
+  return MOBILE_FLIGHT_SNAPSHOT_PREFIX + String(id || "");
+}
+
+function saveMobileFlightSnapshot(record) {
+  const normalized = normalizedMobileRecord(record);
+  if (!normalized.id) return;
+  try {
+    window.sessionStorage?.setItem(mobileFlightSnapshotKey(normalized.id), JSON.stringify({
+      storedAt: Date.now(),
+      ttl: MOBILE_FLIGHT_SNAPSHOT_TTL_MS,
+      record: normalized
+    }));
+  } catch (error) {
+    // Best-effort only.
+  }
+}
+
+function deleteMobileFlightSnapshot(id) {
+  try {
+    window.sessionStorage?.removeItem(mobileFlightSnapshotKey(id));
+  } catch (error) {}
+}
+
+function snapshotMobileFlightFromElement(element) {
+  const id = element?.dataset?.viewId;
+  if (!id) return;
+  const record = mobileRecords.find((item) => String(item.id) === String(id));
+  if (record) saveMobileFlightSnapshot(record);
 }
 
 function mobileFlightCard(record, options = {}) {
@@ -224,13 +325,13 @@ function mobileFlightCard(record, options = {}) {
             <time>${escapeMobileHtml(displayMobile(r.departure_time, "--:--"))}</time>
             <span class="mobile-dot depart" aria-hidden="true"></span>
             <strong>${escapeMobileHtml(stationLabel(r.departure_station, r.departure_terminal))}</strong>
-            <time>${escapeMobileHtml(mobileTimeText(r.arrival_time, r.arrival_next_day))}</time>
+            <time>${mobileTimeHtml(r.arrival_time, r.arrival_next_day)}</time>
             <span class="mobile-dot arrive" aria-hidden="true"></span>
             <strong>${escapeMobileHtml(stationLabel(r.arrival_station, r.arrival_terminal))}</strong>
           </div>
         </div>
         <div class="mobile-card-actions">
-          <a href="./flight.html?id=${id}">View</a>
+          <a href="./flight.html?id=${id}" data-view-id="${escapeMobileHtml(r.id)}">View</a>
           <a href="./edit.html?id=${id}">Edit</a>
           <button class="danger" type="button" data-delete-id="${escapeMobileHtml(r.id)}" data-delete-no="${escapeMobileHtml(r.record_no)}">Delete</button>
         </div>
@@ -239,6 +340,7 @@ function mobileFlightCard(record, options = {}) {
 }
 
 function setMobileListStatus(message, type = "") {
+  mobileListStatus.hidden = !message;
   mobileListStatus.textContent = message || "";
   mobileListStatus.className = "mobile-status-text" + (type ? ` ${type}` : "");
 }
@@ -276,32 +378,65 @@ function buildMobileListUrl(page) {
   return url.toString();
 }
 
-async function loadMobilePage(page = 1) {
-  const requestId = ++mobileListRequestId;
-  setMobileLoading(true);
-  setMobileListStatus(mobileFilterText.value.trim() ? "Searching" : "Loading");
-  mobileRecordsList.innerHTML = '<p class="mobile-muted">Loading...</p>';
+function applyMobileListResult(result, page) {
+  mobileRecords = Array.isArray(result.records) ? result.records : [];
+  mobilePagination = result.pagination || mobilePagination;
+  mobileCurrentPage = mobilePagination.page || page;
+  setMobileSummary(result.summary || {});
+  hydrateMobileDistance(result.summary || {});
+  renderMobileFlights();
+}
+
+async function fetchMobilePage(page, requestId, cacheKey, options = {}) {
+  const preserveList = options.preserveList === true;
+  if (mobileListAbortController) mobileListAbortController.abort();
+  mobileListAbortController = new AbortController();
+
+  setMobileLoading(!preserveList);
+  setMobileListStatus(mobileFilterText.value.trim() ? "Searching" : preserveList ? "Updating" : "Loading");
+  if (!preserveList) mobileRecordsList.innerHTML = '<p class="mobile-muted">Loading...</p>';
+
   try {
-    const response = await fetch(buildMobileListUrl(page), { headers: { accept: "application/json" } });
+    const response = await fetch(cacheKey, {
+      headers: { accept: "application/json" },
+      signal: mobileListAbortController.signal
+    });
     const result = await response.json().catch(() => null);
     if (requestId !== mobileListRequestId) return;
     if (!response.ok || !result || !result.ok) throw new Error(result?.error || `HTTP ${response.status}`);
-    mobileRecords = Array.isArray(result.records) ? result.records : [];
-    mobilePagination = result.pagination || mobilePagination;
-    mobileCurrentPage = mobilePagination.page || page;
-    setMobileSummary(result.summary || {});
-    hydrateMobileDistance(result.summary || {});
-    renderMobileFlights();
+    writeMobileListCache(cacheKey, result);
+    applyMobileListResult(result, page);
+    setMobileListStatus("");
   } catch (error) {
+    if (error.name === "AbortError") return;
     if (requestId !== mobileListRequestId) return;
-    mobileRecords = [];
-    mobileDistanceRequestId += 1;
-    setMobileSummary();
-    mobileRecordsList.innerHTML = `<p class="mobile-muted">${escapeMobileHtml("Failed to load flights: " + error.message)}</p>`;
+    if (!preserveList) {
+      mobileRecords = [];
+      mobileDistanceRequestId += 1;
+      setMobileSummary();
+      mobileRecordsList.innerHTML = `<p class="mobile-muted">${escapeMobileHtml("Failed to load flights: " + error.message)}</p>`;
+    }
     setMobileListStatus("Offline / API unavailable", "error");
   } finally {
     if (requestId === mobileListRequestId) setMobileLoading(false);
   }
+}
+
+async function loadMobilePage(page = 1, options = {}) {
+  const requestId = ++mobileListRequestId;
+  const cacheKey = buildMobileListUrl(page);
+  const cached = options.forceRefresh ? null : readMobileListCache(cacheKey);
+
+  if (cached) {
+    if (mobileListAbortController) mobileListAbortController.abort();
+    applyMobileListResult(cached, page);
+    setMobileLoading(false);
+    setMobileListStatus("");
+    fetchMobilePage(page, requestId, cacheKey, { preserveList: true });
+    return;
+  }
+
+  await fetchMobilePage(page, requestId, cacheKey);
 }
 
 async function deleteMobileRecord(id, recordNo) {
@@ -314,7 +449,9 @@ async function deleteMobileRecord(id, recordNo) {
     const response = await fetch(url.toString(), { method: "DELETE", headers: { accept: "application/json" } });
     const result = await response.json().catch(() => null);
     if (!response.ok || !result || !result.ok) throw new Error(result?.error || `HTTP ${response.status}`);
-    await loadMobilePage(mobileCurrentPage);
+    clearMobileListCache();
+    deleteMobileFlightSnapshot(id);
+    await loadMobilePage(mobileCurrentPage, { forceRefresh: true });
   } catch (error) {
     window.alert("Failed to delete flight record: " + error.message);
     setMobileListStatus("Error", "error");
@@ -333,9 +470,17 @@ function setMobileFilterOpen(open) {
 }
 
 mobileRecordsList.addEventListener("click", (event) => {
+  const viewLink = event.target.closest("[data-view-id]");
+  if (viewLink) snapshotMobileFlightFromElement(viewLink);
+
   const button = event.target.closest("[data-delete-id]");
   if (button) deleteMobileRecord(button.dataset.deleteId, button.dataset.deleteNo);
 });
+
+mobileRecordsList.addEventListener("pointerdown", (event) => {
+  const viewLink = event.target.closest("[data-view-id]");
+  if (viewLink) snapshotMobileFlightFromElement(viewLink);
+}, { passive: true });
 mobileFilterToggle.addEventListener("click", () => setMobileFilterOpen(mobileFilterPanel.hidden));
 mobileFilterText.addEventListener("input", () => {
   window.clearTimeout(mobileSearchTimer);
@@ -344,8 +489,14 @@ mobileFilterText.addEventListener("input", () => {
 mobileFilterText.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMobileFilterOpen(false);
 });
-mobilePageLimit.addEventListener("change", () => loadMobilePage(1));
-mobileRefreshBtn.addEventListener("click", () => loadMobilePage(mobileCurrentPage));
+mobilePageLimit.addEventListener("change", () => {
+  clearMobileListCache();
+  loadMobilePage(1, { forceRefresh: true });
+});
+mobileRefreshBtn.addEventListener("click", () => {
+  clearMobileListCache();
+  loadMobilePage(mobileCurrentPage, { forceRefresh: true });
+});
 mobilePrevBtn.addEventListener("click", () => loadMobilePage(Math.max(1, mobileCurrentPage - 1)));
 mobileNextBtn.addEventListener("click", () => loadMobilePage(mobileCurrentPage + 1));
 
