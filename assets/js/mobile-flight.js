@@ -34,11 +34,6 @@ function isYes(value) {
   return String(value || "").trim().toLowerCase() === "yes";
 }
 
-function mobileArrivalTimeText(record) {
-  const time = displayDetail(record.arrival_time, "--:--");
-  return isYes(record.arrival_next_day) && time !== "--:--" ? `${time} +1 Day` : time;
-}
-
 function getMobileRecordId() {
   const id = Number(new URLSearchParams(window.location.search).get("id"));
   if (!Number.isInteger(id) || id <= 0) throw new Error("Invalid record reference");
@@ -82,6 +77,19 @@ function writeMobileFlightSnapshot(record) {
 function setDetailText(id, value, fallback = "-") {
   const el = document.getElementById(id);
   if (el) el.textContent = displayDetail(value, fallback);
+}
+
+function setMobileArrivalTime(record) {
+  const el = document.getElementById("mobileArrivalTime");
+  if (!el) return;
+  const time = displayDetail(record.arrival_time, "--:--");
+  el.textContent = time;
+  if (isYes(record.arrival_next_day) && time !== "--:--") {
+    const badge = document.createElement("span");
+    badge.className = "mobile-detail-next-day-badge";
+    badge.textContent = "+1";
+    el.appendChild(badge);
+  }
 }
 
 function formatMobileRouteDistance(km) {
@@ -210,7 +218,7 @@ function fillDetailHero(record) {
   setDetailText("mobileDepartureTime", record.departure_time, "--:--");
   setDetailText("mobileDepartureStation", record.departure_station);
   setDetailText("mobileDepartureTerminal", record.departure_terminal);
-  setDetailText("mobileArrivalTime", mobileArrivalTimeText(record), "--:--");
+  setMobileArrivalTime(record);
   setDetailText("mobileArrivalStation", record.arrival_station);
   setDetailText("mobileArrivalTerminal", record.arrival_terminal);
 }
