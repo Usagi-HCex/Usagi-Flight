@@ -84,11 +84,13 @@ function setMobileArrivalTime(record) {
   if (!el) return;
   const time = displayDetail(record.arrival_time, "--:--");
   el.textContent = time;
+  el.classList.remove("has-next-day");
+  el.removeAttribute("data-next-day");
+  el.removeAttribute("aria-label");
   if (isYes(record.arrival_next_day) && time !== "--:--") {
-    const badge = document.createElement("span");
-    badge.className = "mobile-detail-next-day-badge";
-    badge.textContent = "+1";
-    el.appendChild(badge);
+    el.classList.add("has-next-day");
+    el.dataset.nextDay = "+1";
+    el.setAttribute("aria-label", `${time} +1 Day`);
   }
 }
 
