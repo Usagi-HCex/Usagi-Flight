@@ -89,7 +89,7 @@ function setMobileArrivalTime(record) {
   el.removeAttribute("aria-label");
   if (isYes(record.arrival_next_day) && time !== "--:--") {
     el.classList.add("has-next-day");
-    el.dataset.nextDay = "+1";
+    el.dataset.nextDay = "+1 Day";
     el.setAttribute("aria-label", `${time} +1 Day`);
   }
 }

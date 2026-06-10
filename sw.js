@@ -1,4 +1,4 @@
-const CACHE_NAME = "flight-log-pwa-v13";
+const CACHE_NAME = "flight-log-pwa-v14";
 const SHELL_URLS = [
   "./",
   "./index.html",
