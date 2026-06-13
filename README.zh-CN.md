@@ -225,7 +225,7 @@ Build command: npm run build:workers
 Deploy command: npx wrangler deploy --config wrangler.toml
 ```
 
-真实 `wrangler.toml` 可能包含环境专属 D1 ID，所以默认不提交。网页构建中可以通过构建环境变量临时生成：
+真实 `wrangler.toml` 默认不保存在仓库里。网页构建中可以通过构建环境变量临时生成：
 
 ```bash
 cat > wrangler.toml <<EOF
